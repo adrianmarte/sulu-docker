@@ -13,7 +13,7 @@ services:
         aliases:
          - ${PROJECT_DOMAIN}
     volumes:
-      - ${PROJECT_PATH}:/var/www/project:cached
+      - ${PROJECT_PATH}:/var/www/project:delegated
       - ./var/logs/nginx/:/var/log/nginx
 
   php:
@@ -22,16 +22,16 @@ services:
       args:
         USER_ID: ${USER_ID}
     volumes:
-      - ${PROJECT_PATH}:/var/www/project:cached
-      - ./var/logs/symfony:/var/www/project/var/logs:cached
-      - ./var/data/php/workspace:/var/www/workspace:cached
-      - ${COMPOSER_PATH}/cache:/var/www/.composer/cache:cached
+      - ${PROJECT_PATH}:/var/www/project:delegated
+      - ./var/logs/symfony:/var/www/project/var/logs:delegated
+      - ./var/data/php/workspace:/var/www/workspace:delegated
+      - ${COMPOSER_PATH}/cache:/var/www/.composer/cache:delegated
       - ${SSH_KEY_PATH}/id_rsa:/var/www/.ssh/id_rsa
       - ${SSH_KEY_PATH}/id_rsa.pub:/var/www/.ssh/id_rsa.pub
       - ${SSH_KEY_PATH}/known_hosts:/var/www/.ssh/known_hosts
     environment:
       HISTFILE: /var/www/workspace/.bash_history
-      PROMPT_COMMAND: history -a
+      PROMPT_COMMAND: history -a 
     env_file: .env
 
   mysql:
@@ -43,7 +43,7 @@ services:
     ports:
       - ${PORT_MYSQL}:3306
     volumes:
-      - ./var/data/mysql:/var/lib/mysql:cached
+      - ./var/data/mysql:/var/lib/mysql:delegated
     env_file: .env
 
   blackfire:
@@ -54,7 +54,7 @@ services:
     build:
         context: docker/elk/elasticsearch
     volumes:
-      - ./var/data/elasticsearch:/usr/share/elasticsearch/data:cached
+      - ./var/data/elasticsearch:/usr/share/elasticsearch/data:delegated
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
 
@@ -64,7 +64,7 @@ services:
     depends_on:
       - elasticsearch
     volumes:
-      - ./var/logs:/var/log/other:cached
+      - ./var/logs:/var/log/other:delegated
 
   kibana:
     build:
