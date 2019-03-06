@@ -32,6 +32,11 @@ services:
     environment:
       HISTFILE: /var/www/workspace/.bash_history
       PROMPT_COMMAND: history -a
+      # DATABASE_URL build from environment variables
+      # 
+      # This is helpful because in sulu distribution this variable is not set in .env.dist. 
+      # A missing DATABASE_URL would leads to a failing "create-project" in docker when following README
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}       
     env_file: .env
 
   mysql:
@@ -39,9 +44,9 @@ services:
         context: docker/mysql
         args:
           MYSQL_DATABASE: ${MYSQL_DATABASE}
-          MYSQL_USER: ${MYSQL_USER}
+          MYSQL_USER: ${MYSQL_USER}         
     ports:
-      - ${PORT_MYSQL}:3306
+      - ${PORT_MYSQL}:${MYSQL_PORT}
     volumes:
       - ./var/data/mysql:/var/lib/mysql:cached
     env_file: .env
